@@ -1,0 +1,28 @@
+# IDE - Antigravity / VSCode
+.history/
+.vscode/
+
+# IDE - Claude / Gemini / Copilot local states
+.claude/
+.gemini/
+!.gemini/antigravity/brain/ # Just in case, though usually brain is outside project
+.github/copilot-instructions.md
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Framework temporary files
+scripts/*.tmp
+mktemp.*
+
+# Build/Dependencies (if any added later)
+node_modules/
+dist/
+build/
