@@ -22,20 +22,20 @@ This repository contains an AI-assisted programming framework designed to optimi
 
 ## Available Skills
 
-| Skill           | Description                                                                  | URL                                                                          |
-| --------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| `docs-standard` | Standard for creating technical documentation in this repository.            | [.agent/skills/docs-standard/SKILL.md](.agent/skills/docs-standard/SKILL.md) |
-| `skill-creator` | Create and initialize new Antigravity Skills following the project standard. | [.agent/skills/skill-creator/SKILL.md](.agent/skills/skill-creator/SKILL.md) |
+| Skill              | Description                                                                  | URL                                                                                |
+| ------------------ | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `docs-standard`    | Standard for creating technical documentation in this repository.            | [.agent/skills/docs-standard/SKILL.md](.agent/skills/docs-standard/SKILL.md)       |
+| `skill-creator`    | Create and initialize new Antigravity Skills following the project standard. | [.agent/skills/skill-creator/SKILL.md](.agent/skills/skill-creator/SKILL.md)       |
+| `workflow-creator` |                                                                              | [.agent/skills/workflow-creator/SKILL.md](.agent/skills/workflow-creator/SKILL.md) |
 
 ## Auto-invoke Rules
 
 Cuando realices las siguientes tareas, DEBES cargar la skill correspondiente para asegurar el cumplimiento cultural:
 
-| Action                      | Skill to invoke          | Trigger                               |
-| --------------------------- | ------------------------ | ------------------------------------- |
-| Creación de nuevas skills   | `skill-creator`          | "Necesito crear una nueva habilidad"  |
-| Sincronización de metadatos | `scripts/sync-skills.sh` | "Actualiza el índice de skills"       |
-| Documentación técnica       | `docs-standard`          | "Escribe un nuevo documento en docs/" |
+| Creación de nuevas skills | `skill-creator` | "Necesito crear una nueva habilidad" |
+| Creación de nuevos workflows | `workflow-creator` | "Necesito crear un nuevo workflow" |
+| Sincronización de metadatos | `scripts/sync-skills.sh` | "Actualiza el índice de skills" |
+| Documentación técnica | `docs-standard` | "Escribe un nuevo documento en docs/" |
 
 ## Technical Stack
 
