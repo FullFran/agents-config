@@ -37,10 +37,11 @@ cd <repo>
 ```
 📁 Proyecto
 ├── AGENTS.md              ← Fuente de verdad (SE COMMITEA)
-├── .agent/                ← Skills, rules, workflows (SE COMMITEA)
+├── .agent/                ← Fuente de verdad (SE COMMITEA)
 │   ├── skills/            ← Habilidades modulares (agentskills.io)
 │   ├── rules/             ← Reglas de arquitectura/estilo
-│   └── workflows/         ← Automatizaciones (slash commands)
+│   ├── workflows/         ← Automatizaciones (slash commands)
+│   └── agents/            ← Personas / Output Styles (ej: code-ninja)
 │
 │   ─── GENERADOS (symlinks, en .gitignore) ───
 ├── CLAUDE.md              → AGENTS.md
@@ -48,6 +49,7 @@ cd <repo>
 ├── .cursorrules           → AGENTS.md
 ├── .github/copilot-instr. → AGENTS.md
 ├── .opencode/skills/*     → .agent/skills/*
+├── .opencode/agents/*     → .agent/agents/* (Personas)
 ├── .opencode/commands/*   → .agent/workflows/* (Slash Commands)
 └── .claude/skills         → .agent/skills
 ```
@@ -57,7 +59,7 @@ cd <repo>
 Solo se commitean dos cosas:
 
 1. **`AGENTS.md`**: Instrucciones generales del proyecto para cualquier agente IA.
-2. **`.agent/`**: El cerebro modular (Skills siguiendo el estándar `agentskills.io`, reglas y workflows).
+2. **`.agent/`**: El cerebro modular (Skills siguiendo el estándar `agentskills.io`, reglas, personas y workflows).
 
 Todo lo demás se genera localmente con symlinks. Si modificas la fuente de verdad, todos los agentes ven el cambio automáticamente.
 
@@ -69,7 +71,24 @@ Todo lo demás se genera localmente con symlinks. Si modificas la fuente de verd
 
 1. **Clona el repo** y ejecuta `./scripts/setup-agents.sh`.
 2. **Elige tu agente** (OpenCode, Antigravity, Claude, etc.).
-3. **Trabaja normalmente**: El agente ya tiene todo el contexto, habilidades y comandos personalizados.
+3. **Trabaja normalmente**: El agente ya tiene todo el contexto, habilidades, comandos personalizados y estilos de salida.
+
+---
+
+## Agentes y Personas (Output Styles)
+
+El framework permite definir distintas "personalidades" en `.agent/agents/`. Esto es equivalente a los *Output Styles* de Claude.
+
+- **OpenCode**: Puedes invocar personalidades específicas usando el prefijo `@` (ej: `@code-ninja`).
+- **Antigravity**: Las personalidades se inyectan como reglas de sistema para guiar el estilo de respuesta.
+
+### Personas Incluidas:
+- `senior-architect`: Tu mentor de confianza. Explicativo, cálido y enfocado en buenas prácticas.
+- `code-ninja`: Estilo minimalista. Sin charlas, solo código y lo estrictamente necesario.
+
+---
+
+## Cómo Funciona (Mantenedor)
 
 ### Para el mantenedor
 

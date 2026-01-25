@@ -130,13 +130,21 @@ mv "$NEW_AGENTS" "$AGENTS_MD"
 # 2. Sync OpenCode if active
 if [ "$SYNC_OPENCODE" = true ]; then
     echo -e "${BLUE}Syncing OpenCode (.opencode/)...${NC}"
-    mkdir -p "$REPO_ROOT/.opencode/skills" "$REPO_ROOT/.opencode/commands"
+    mkdir -p "$REPO_ROOT/.opencode/skills" "$REPO_ROOT/.opencode/agents" "$REPO_ROOT/.opencode/commands"
     
     # Skills
     for skill in "$SKILLS_DIR"/*/; do
         if [ -d "$skill" ]; then
             skill_name=$(basename "$skill")
             ln -sf "../../.agent/skills/$skill_name" "$REPO_ROOT/.opencode/skills/$skill_name"
+        fi
+    done
+
+    # Agents (Output Styles)
+    for agent in "$AGENT_DIR/agents"/*.md; do
+        if [ -f "$agent" ]; then
+            agent_name=$(basename "$agent")
+            ln -sf "../../.agent/agents/$agent_name" "$REPO_ROOT/.opencode/agents/$agent_name"
         fi
     done
 

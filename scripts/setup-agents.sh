@@ -59,6 +59,16 @@ setup_opencode() {
         fi
     done
 
+    # Create symlinks for each agent persona
+    for agent in "$AGENT_DIR/agents"/*.md; do
+        if [ -f "$agent" ]; then
+            agent_name=$(basename "$agent")
+            target_link="$REPO_ROOT/.opencode/agents/$agent_name"
+            [ -L "$target_link" ] && rm "$target_link"
+            ln -sf "../../.agent/agents/$agent_name" "$target_link"
+        fi
+    done
+
     # Create symlinks for workflows (Commands in OpenCode)
     for wf in "$AGENT_DIR/workflows"/*.md; do
         if [ -f "$wf" ]; then
@@ -106,6 +116,7 @@ EOF
     fi
     
     echo -e "  ${GREEN}✓${NC} .opencode/skills/ linked"
+    echo -e "  ${GREEN}✓${NC} .opencode/agents/ linked"
     echo -e "  ${GREEN}✓${NC} opencode.json ready"
 }
 
@@ -155,8 +166,20 @@ setup_antigravity() {
     [ -L "$REPO_ROOT/GEMINI.md" ] && rm "$REPO_ROOT/GEMINI.md"
     [ -f "$REPO_ROOT/GEMINI.md" ] && rm "$REPO_ROOT/GEMINI.md"
     ln -sf "AGENTS.md" "$REPO_ROOT/GEMINI.md"
+
+    # Link agent personas to rules so Antigravity can load them as instructions
+    mkdir -p "$AGENT_DIR/rules"
+    for agent in "$AGENT_DIR/agents"/*.md; do
+        if [ -f "$agent" ]; then
+            agent_name=$(basename "$agent")
+            target_link="$AGENT_DIR/rules/persona-$agent_name"
+            [ -L "$target_link" ] && rm "$target_link"
+            ln -sf "../agents/$agent_name" "$target_link"
+        fi
+    done
     
     echo -e "  ${GREEN}✓${NC} GEMINI.md → AGENTS.md (symlink)"
+    echo -e "  ${GREEN}✓${NC} .agent/agents/ linked to rules for persona support"
     echo -e "  ${GREEN}✓${NC} .agent/ structure is native to Antigravity"
 }
 
