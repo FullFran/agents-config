@@ -24,9 +24,17 @@ This repository contains an AI-assisted programming framework designed to optimi
 
 | Skill | Description | URL |
 |-------|-------------|-----|
-| `docs-standard` | Standard for creating technical documentation in this repository. | [.agent/skills/docs-standard/SKILL.md](.agent/skills/docs-standard/SKILL.md) |
-| `skill-creator` | Create and initialize new Antigravity Skills following the project standard. | [.agent/skills/skill-creator/SKILL.md](.agent/skills/skill-creator/SKILL.md) |
-| `workflow-creator` |  | [.agent/skills/workflow-creator/SKILL.md](.agent/skills/workflow-creator/SKILL.md) |
+| `docs-standard` | Standard for creating technical documentation in this repository. Use this when writing new documentation in docs/ to ensure consistent hierarchy and formatting. | [.agent/skills/docs-standard/SKILL.md](.agent/skills/docs-standard/SKILL.md) |
+| `skill-creator` | Create and initialize new Agent Skills following the agentskills.io standard. Use this when you need to modularize a new capability for the AI agent. | [.agent/skills/skill-creator/SKILL.md](.agent/skills/skill-creator/SKILL.md) |
+| `workflow-creator` | Create new Antigravity workflows to automate repetitive tasks. Use this when the user wants to formalize a multi-step process into an automated workflow. | [.agent/skills/workflow-creator/SKILL.md](.agent/skills/workflow-creator/SKILL.md) |
+## Skill Standards (agentskills.io)
+
+All skills in this repository MUST follow the [agentskills.io](https://agentskills.io) specification:
+1. **Directory Structure**: `.agent/skills/<skill-name>/SKILL.md`
+2. **Naming**: Lowercase alphanumeric and hyphens only (match directory name).
+3. **Frontmatter**: Must include `name` and `description`.
+4. **Validation**: Run `./scripts/sync-skills.sh` to validate skills.
+
 ## Auto-invoke Rules
 
 Cuando realices las siguientes tareas, DEBES cargar la skill correspondiente para asegurar el cumplimiento cultural:
