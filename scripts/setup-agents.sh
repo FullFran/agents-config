@@ -23,7 +23,7 @@ AGENTS=("opencode" "claude" "copilot" "cursor" "antigravity")
 
 print_header() {
     echo ""
-    echo -e "${CYAN}${BOLD}🤖 AI Agent Setup${NC}"
+    echo -e "${CYAN}${BOLD}🤖 Agents Config Setup${NC}"
     echo -e "${CYAN}═══════════════════════════════════════${NC}"
     echo -e "Source of truth: ${GREEN}AGENTS.md${NC} + ${GREEN}.agent/${NC}"
     echo ""

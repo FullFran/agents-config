@@ -1,4 +1,4 @@
-# AI-Assisted Programming Framework
+# Agents Config (Agentic-First Framework)
 
 Framework multi-agente para desarrollo asistido por IA. Una sola fuente de verdad, compatible con todos los IDEs y agentes de terminal.
 
