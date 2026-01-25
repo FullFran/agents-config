@@ -2,11 +2,28 @@
 .history/
 .vscode/
 
-# IDE - Claude / Gemini / Copilot local states
+# ============================================
+# GENERATED AGENT CONFIGS (run ./scripts/setup-agents.sh)
+# Source of truth: AGENTS.md + .agent/
+# ============================================
+
+# OpenCode TUI
+.opencode/
+opencode.json
+
+# Claude Code
 .claude/
+CLAUDE.md
+
+# Gemini / Antigravity (legacy)
+GEMINI.md
 .gemini/
-!.gemini/antigravity/brain/ # Just in case, though usually brain is outside project
+
+# GitHub Copilot
 .github/copilot-instructions.md
+
+# Cursor
+.cursorrules
 
 # OS files
 .DS_Store
