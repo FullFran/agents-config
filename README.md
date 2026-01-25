@@ -65,9 +65,26 @@ Todo lo demás se genera localmente con symlinks. Si modificas la fuente de verd
 
 ---
 
-## Cómo Funciona
+## 🛠️ Flujo de Trabajo (Añadir Contenido)
 
-### Para el desarrollador
+Para mantener la integridad del sistema, **todo el contenido nuevo debe nacer en la carpeta `.agent/`**.
+
+1. **Nueva Skill**: Crear en `.agent/skills/nombre-skill/`.
+2. **Nuevo Workflow**: Crear en `.agent/workflows/nombre.md`.
+3. **Nueva Persona**: Crear en `.agent/agents/nombre.md`.
+
+Una vez creado el archivo, ejecuta:
+```bash
+./scripts/sync-skills.sh
+```
+Esto creará los symlinks necesarios en `.opencode/`, `.claude/`, etc., y actualizará el índice global de `AGENTS.md`.
+
+> [!IMPORTANT]
+> Si editas un archivo directamente desde las carpetas generadas (ej: `.opencode/skills/skill.md`), **el cambio se guardará en la fuente de verdad** porque son symlinks. Sin embargo, evita crear archivos nuevos fuera de `.agent/` ya que no serán trackeados correctamente.
+
+---
+
+## Cómo Funciona (Desarrollador)
 
 1. **Clona el repo** y ejecuta `./scripts/setup-agents.sh`.
 2. **Elige tu agente** (OpenCode, Antigravity, Claude, etc.).
