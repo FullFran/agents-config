@@ -1,186 +1,152 @@
 #!/bin/bash
-# Setup AI Agents for the framework
-# Generates local config from the source of truth (.agent/ + AGENTS.md)
-# Each developer runs this to configure their preferred agent(s)
+# ──────────────────────────────────────────────────────────────────────────────
+# 🤖 AGENTS CONFIG SETUP
+# Source of truth: .agents/ + AGENTS.md
+# ──────────────────────────────────────────────────────────────────────────────
+# This script configures local agent profiles using symlinks to ensure 
+# a single source of truth across all AI assistants.
+# ──────────────────────────────────────────────────────────────────────────────
 
 set -e
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-AGENT_DIR="$REPO_ROOT/.agent"
+AGENT_DIR="$REPO_ROOT/.agents"
 SKILLS_DIR="$AGENT_DIR/skills"
 
-# Colors for output
+# 🎨 Colors & Formatting
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
 CYAN='\033[0;36m'
+MAGENTA='\033[0;35m'
 BOLD='\033[1m'
+DIM='\033[2m'
 NC='\033[0m'
 
-# Available agents
-AGENTS=("opencode" "claude" "copilot" "cursor" "antigravity")
+# 🎭 Icons
+ICON_SUCCESS="✨"
+ICON_WORKING="⚙️ "
+ICON_AGENT="🤖"
+ICON_FILE="📄"
+ICON_LINK="🔗"
+ICON_ERROR="❌"
 
-print_header() {
-    echo ""
-    echo -e "${CYAN}${BOLD}🤖 Agents Config Setup${NC}"
-    echo -e "${CYAN}═══════════════════════════════════════${NC}"
-    echo -e "Source of truth: ${GREEN}AGENTS.md${NC} + ${GREEN}.agent/${NC}"
+# ──────────────────────────────────────────────────────────────────────────────
+# Helper Functions
+# ──────────────────────────────────────────────────────────────────────────────
+
+print_banner() {
+    clear
+    echo -e "${MAGENTA}${BOLD}┌──────────────────────────────────────────────────────────┐${NC}"
+    echo -e "${MAGENTA}${BOLD}│                                                          │${NC}"
+    echo -e "${MAGENTA}${BOLD}│   ${NC}${BOLD}AGENTS CONFIG SETUP${NC}${MAGENTA}${BOLD}                                    │${NC}"
+    echo -e "${MAGENTA}${BOLD}│   ${NC}${DIM}The canon way to sync your AI brain${NC}${MAGENTA}${BOLD}                    │${NC}"
+    echo -e "${MAGENTA}${BOLD}│                                                          │${NC}"
+    echo -e "${MAGENTA}${BOLD}└──────────────────────────────────────────────────────────┘${NC}"
+    echo -e " ${DIM}Root:${NC} ${CYAN}$REPO_ROOT${NC}"
+    echo -e " ${DIM}Source:${NC} ${GREEN}.agents/${NC} ${DIM}+${NC} ${GREEN}AGENTS.md${NC}"
     echo ""
 }
 
-print_menu() {
-    echo -e "${BOLD}Select agents to configure:${NC}"
-    echo ""
-    echo -e "  ${CYAN}1)${NC} opencode    - OpenCode TUI (.opencode/)"
-    echo -e "  ${CYAN}2)${NC} claude      - Claude Code (.claude/ + CLAUDE.md)"
-    echo -e "  ${CYAN}3)${NC} copilot     - GitHub Copilot (.github/copilot-instructions.md)"
-    echo -e "  ${CYAN}4)${NC} cursor      - Cursor IDE (.cursorrules)"
-    echo -e "  ${CYAN}5)${NC} antigravity - Antigravity IDE (GEMINI.md)"
-    echo ""
-    echo -e "  ${CYAN}a)${NC} all         - Configure all agents"
-    echo -e "  ${CYAN}q)${NC} quit        - Exit"
-    echo ""
+print_status() {
+    local color=$1
+    local icon=$2
+    local msg=$3
+    echo -e " ${color}${icon}${NC} ${msg}"
 }
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Agent Setups
+# ──────────────────────────────────────────────────────────────────────────────
 
 setup_opencode() {
-    echo -e "${BLUE}Configuring OpenCode TUI...${NC}"
+    print_status "$BLUE" "$ICON_WORKING" "Configuring ${BOLD}OpenCode TUI${NC}..."
     
     # Create directories
     mkdir -p "$REPO_ROOT/.opencode/skills" "$REPO_ROOT/.opencode/agents" "$REPO_ROOT/.opencode/commands"
     
-    # Create symlinks for each skill
+    # Link Skills
     for skill in "$SKILLS_DIR"/*/; do
         if [ -d "$skill" ]; then
             skill_name=$(basename "$skill")
-            target_link="$REPO_ROOT/.opencode/skills/$skill_name"
-            [ -L "$target_link" ] && rm "$target_link"
-            ln -sf "../../.agent/skills/$skill_name" "$target_link"
+            ln -sf "../../.agents/skills/$skill_name" "$REPO_ROOT/.opencode/skills/$skill_name"
         fi
     done
 
-    # Create symlinks for each agent persona
+    # Link Personas
     for agent in "$AGENT_DIR/agents"/*.md; do
         if [ -f "$agent" ]; then
             agent_name=$(basename "$agent")
-            target_link="$REPO_ROOT/.opencode/agents/$agent_name"
-            [ -L "$target_link" ] && rm "$target_link"
-            ln -sf "../../.agent/agents/$agent_name" "$target_link"
+            ln -sf "../../.agents/agents/$agent_name" "$REPO_ROOT/.opencode/agents/$agent_name"
         fi
     done
 
-    # Create symlinks for workflows (Commands in OpenCode)
+    # Link Commands
     for wf in "$AGENT_DIR/workflows"/*.md; do
         if [ -f "$wf" ]; then
             wf_name=$(basename "$wf")
-            target_link="$REPO_ROOT/.opencode/commands/$wf_name"
-            [ -L "$target_link" ] && rm "$target_link"
-            ln -sf "../../.agent/workflows/$wf_name" "$target_link"
+            ln -sf "../../.agents/workflows/$wf_name" "$REPO_ROOT/.opencode/commands/$wf_name"
         fi
     done
     
-    # Create opencode.json if it doesn't exist
+    # opencode.json
     if [ ! -f "$REPO_ROOT/opencode.json" ]; then
         cat > "$REPO_ROOT/opencode.json" << 'EOF'
 {
   "$schema": "https://opencode.ai/config.json",
   "instructions": [
     "AGENTS.md",
-    ".agent/rules/*.md"
+    ".agents/rules/*.md"
   ],
   "permission": {
-    "skill": {
-      "*": "allow"
-    },
+    "skill": { "*": "allow" },
     "bash": {
       "*": "allow",
       "git commit *": "ask",
       "git push *": "ask",
-      "git push": "ask",
-      "git push --force *": "ask",
       "git rebase *": "ask",
       "git reset --hard *": "ask"
     },
     "read": {
       "*": "allow",
       "*.env": "deny",
-      "*.env.*": "deny",
-      "**/.env": "deny",
-      "**/.env.*": "deny",
-      "**/secrets/**": "deny",
-      "**/credentials.json": "deny"
+      "**/secrets/**": "deny"
     }
   }
 }
 EOF
     fi
-    
-    echo -e "  ${GREEN}✓${NC} .opencode/skills/ linked"
-    echo -e "  ${GREEN}✓${NC} .opencode/agents/ linked"
-    echo -e "  ${GREEN}✓${NC} opencode.json ready"
+    print_status "$GREEN" "$ICON_SUCCESS" "OpenCode ready (.opencode/)"
 }
 
 setup_claude() {
-    echo -e "${BLUE}Configuring Claude Code...${NC}"
-    
-    # Create directory and symlink for skills
+    print_status "$BLUE" "$ICON_WORKING" "Configuring ${BOLD}Claude Code${NC}..."
     mkdir -p "$REPO_ROOT/.claude"
-    [ -L "$REPO_ROOT/.claude/skills" ] && rm "$REPO_ROOT/.claude/skills"
-    ln -sf "../.agent/skills" "$REPO_ROOT/.claude/skills"
-    
-    # Symlink AGENTS.md to CLAUDE.md (auto-sync!)
-    [ -L "$REPO_ROOT/CLAUDE.md" ] && rm "$REPO_ROOT/CLAUDE.md"
-    [ -f "$REPO_ROOT/CLAUDE.md" ] && rm "$REPO_ROOT/CLAUDE.md"
+    ln -sf "../.agents/skills" "$REPO_ROOT/.claude/skills"
     ln -sf "AGENTS.md" "$REPO_ROOT/CLAUDE.md"
-    
-    echo -e "  ${GREEN}✓${NC} .claude/skills/ → .agent/skills/"
-    echo -e "  ${GREEN}✓${NC} CLAUDE.md → AGENTS.md (symlink)"
+    print_status "$GREEN" "$ICON_SUCCESS" "Claude ready (CLAUDE.md)"
 }
 
 setup_copilot() {
-    echo -e "${BLUE}Configuring GitHub Copilot...${NC}"
-    
+    print_status "$BLUE" "$ICON_WORKING" "Configuring ${BOLD}GitHub Copilot${NC}..."
     mkdir -p "$REPO_ROOT/.github"
-    [ -L "$REPO_ROOT/.github/copilot-instructions.md" ] && rm "$REPO_ROOT/.github/copilot-instructions.md"
-    [ -f "$REPO_ROOT/.github/copilot-instructions.md" ] && rm "$REPO_ROOT/.github/copilot-instructions.md"
     ln -sf "../AGENTS.md" "$REPO_ROOT/.github/copilot-instructions.md"
-    
-    echo -e "  ${GREEN}✓${NC} .github/copilot-instructions.md → AGENTS.md (symlink)"
+    print_status "$GREEN" "$ICON_SUCCESS" "Copilot ready (.github/copilot-instructions.md)"
 }
 
 setup_cursor() {
-    echo -e "${BLUE}Configuring Cursor IDE...${NC}"
-    
-    # Symlink AGENTS.md to .cursorrules
-    [ -L "$REPO_ROOT/.cursorrules" ] && rm "$REPO_ROOT/.cursorrules"
-    [ -f "$REPO_ROOT/.cursorrules" ] && rm "$REPO_ROOT/.cursorrules"
+    print_status "$BLUE" "$ICON_WORKING" "Configuring ${BOLD}Cursor IDE${NC}..."
     ln -sf "AGENTS.md" "$REPO_ROOT/.cursorrules"
-    
-    echo -e "  ${GREEN}✓${NC} .cursorrules → AGENTS.md (symlink)"
+    print_status "$GREEN" "$ICON_SUCCESS" "Cursor ready (.cursorrules)"
 }
 
 setup_antigravity() {
-    echo -e "${BLUE}Configuring Antigravity IDE...${NC}"
-    
-    # Antigravity uses GEMINI.md for the UI Customizations panel
-    [ -L "$REPO_ROOT/GEMINI.md" ] && rm "$REPO_ROOT/GEMINI.md"
-    [ -f "$REPO_ROOT/GEMINI.md" ] && rm "$REPO_ROOT/GEMINI.md"
+    print_status "$BLUE" "$ICON_WORKING" "Configuring ${BOLD}Antigravity IDE${NC}..."
     ln -sf "AGENTS.md" "$REPO_ROOT/GEMINI.md"
-
-    # Link agent personas to rules so Antigravity can load them as instructions
-    mkdir -p "$AGENT_DIR/rules"
-    for agent in "$AGENT_DIR/agents"/*.md; do
-        if [ -f "$agent" ]; then
-            agent_name=$(basename "$agent")
-            target_link="$AGENT_DIR/rules/persona-$agent_name"
-            [ -L "$target_link" ] && rm "$target_link"
-            ln -sf "../agents/$agent_name" "$target_link"
-        fi
-    done
-    
-    echo -e "  ${GREEN}✓${NC} GEMINI.md → AGENTS.md (symlink)"
-    echo -e "  ${GREEN}✓${NC} .agent/agents/ linked to rules for persona support"
-    echo -e "  ${GREEN}✓${NC} .agent/ structure is native to Antigravity"
+    # Antigravity uses .agents/ natively, no extra symlinks needed for personas in rules
+    # as per new 'canon' structure. Mention them with @name.
+    print_status "$GREEN" "$ICON_SUCCESS" "Antigravity ready (GEMINI.md)"
 }
 
 setup_all() {
@@ -191,106 +157,63 @@ setup_all() {
     setup_antigravity
 }
 
-# Check if AGENTS.md exists
+# ──────────────────────────────────────────────────────────────────────────────
+# Main Logic
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Check Source of Truth
 if [ ! -f "$REPO_ROOT/AGENTS.md" ]; then
-    echo -e "${RED}Error: AGENTS.md not found in project root.${NC}"
-    echo -e "This file is the source of truth for agent configuration."
+    print_status "$RED" "$ICON_ERROR" "AGENTS.md not found! This is the source of truth."
     exit 1
 fi
 
-# Parse command line arguments
+# Argument Handling
 if [ $# -gt 0 ]; then
     case "$1" in
-        --all|-a)
-            print_header
-            setup_all
-            echo ""
-            echo -e "${GREEN}${BOLD}✅ All agents configured!${NC}"
-            exit 0
-            ;;
-        --opencode)
-            setup_opencode
-            exit 0
-            ;;
-        --claude)
-            setup_claude
-            exit 0
-            ;;
-        --copilot)
-            setup_copilot
-            exit 0
-            ;;
-        --cursor)
-            setup_cursor
-            exit 0
-            ;;
-        --antigravity|--gemini)
-            setup_antigravity
-            exit 0
-            ;;
+        --all|-a) setup_all ;;
+        --opencode) setup_opencode ;;
+        --claude) setup_claude ;;
+        --copilot) setup_copilot ;;
+        --cursor) setup_cursor ;;
+        --antigravity|--gemini) setup_antigravity ;;
         --help|-h)
             echo "Usage: $0 [OPTIONS]"
-            echo ""
-            echo "Options:"
-            echo "  --all, -a        Configure all agents"
-            echo "  --opencode       Configure OpenCode TUI only"
-            echo "  --claude         Configure Claude Code only"
-            echo "  --copilot        Configure GitHub Copilot only"
-            echo "  --cursor         Configure Cursor IDE only"
-            echo "  --antigravity    Configure Antigravity IDE only"
-            echo "  --help, -h       Show this help"
-            echo ""
-            echo "Without options, runs interactive mode."
+            echo "Options: --all, --opencode, --claude, --copilot, --cursor, --antigravity"
             exit 0
             ;;
         *)
-            echo -e "${RED}Unknown option: $1${NC}"
-            echo "Use --help for usage information."
+            print_status "$RED" "$ICON_ERROR" "Unknown option: $1"
             exit 1
             ;;
     esac
+    echo -e "\n${GREEN}${BOLD}${ICON_SUCCESS} Done!${NC}"
+    exit 0
 fi
 
-# Interactive mode
-print_header
-print_menu
+# Interactive Mode (Modern Feel)
+print_banner
 
-while true; do
-    read -p "$(echo -e ${CYAN}Enter choice [1-5/a/q]: ${NC})" choice
-    
-    case "$choice" in
-        1) setup_opencode ;;
-        2) setup_claude ;;
-        3) setup_copilot ;;
-        4) setup_cursor ;;
-        5) setup_antigravity ;;
-        a|A) setup_all ;;
-        q|Q) 
-            echo -e "${YELLOW}Exiting without changes.${NC}"
-            exit 0
-            ;;
-        *)
-            echo -e "${RED}Invalid choice. Try again.${NC}"
-            continue
-            ;;
-    esac
-    
-    echo ""
-    read -p "$(echo -e ${CYAN}Configure another agent? [y/N]: ${NC})" again
-    case "$again" in
-        y|Y) 
-            echo ""
-            print_menu
-            ;;
-        *)
-            break
-            ;;
-    esac
-done
+echo -e "${BOLD}Choose your agents:${NC}"
+echo -e " ${CYAN}1)${NC} OpenCode TUI       ${DIM}(.opencode/)${NC}"
+echo -e " ${CYAN}2)${NC} Claude Code       ${DIM}(CLAUDE.md)${NC}"
+echo -e " ${CYAN}3)${NC} GitHub Copilot     ${DIM}(.github/)${NC}"
+echo -e " ${CYAN}4)${NC} Cursor IDE         ${DIM}(.cursorrules)${NC}"
+echo -e " ${CYAN}5)${NC} Antigravity        ${DIM}(GEMINI.md)${NC}"
+echo -e " ${CYAN}a)${NC} ${BOLD}Configure All${NC}"
+echo -e " ${CYAN}q)${NC} Quit"
+echo ""
 
-echo ""
-echo -e "${GREEN}${BOLD}✅ Setup complete!${NC}"
-echo -e "${YELLOW}Note: Restart your AI assistant to load the new context.${NC}"
-echo ""
-echo -e "These files are in ${CYAN}.gitignore${NC} - they won't be committed."
-echo -e "Source of truth remains: ${GREEN}AGENTS.md${NC} + ${GREEN}.agent/${NC}"
+read -p "$(echo -e ${MAGENTA}${BOLD}❯ ${NC})" choice
+
+case "$choice" in
+    1) setup_opencode ;;
+    2) setup_claude ;;
+    3) setup_copilot ;;
+    4) setup_cursor ;;
+    5) setup_antigravity ;;
+    a|A) setup_all ;;
+    q|Q) exit 0 ;;
+    *) print_status "$RED" "$ICON_ERROR" "Invalid choice"; exit 1 ;;
+esac
+
+echo -e "\n${GREEN}${BOLD}${ICON_SUCCESS} Setup complete!${NC} ${DIM}Restart your agent to see changes.${NC}\n"

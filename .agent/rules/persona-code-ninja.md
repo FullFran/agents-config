@@ -1,1 +1,0 @@
-../agents/code-ninja.md

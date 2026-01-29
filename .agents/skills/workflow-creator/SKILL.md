@@ -9,7 +9,7 @@ license: MIT
 This skill allows the agent to create structured workflows for Antigravity.
 
 ## Workflow Format
-Workflows are markdown files in `.agent/workflows/` that follow this structure:
+Workflows are markdown files in `.agents/workflows/` that follow this structure:
 
 \`\`\`markdown
 ---
@@ -24,6 +24,6 @@ description: [short title]
 
 ## Process
 1. **Define Task**: Identify the sequence of steps.
-2. **Create File**: `.agent/workflows/<workflow-name>.md`
+2. **Create File**: `.agents/workflows/<workflow-name>.md`
 3. **Annotate**: Use `// turbo` for safe command steps.
 4. **Register**: Mention the workflow in the project documentation.

@@ -4,7 +4,7 @@
 
 # ============================================
 # GENERATED AGENT CONFIGS (run ./scripts/setup-agents.sh)
-# Source of truth: AGENTS.md + .agent/
+# Source of truth: AGENTS.md + .agents/
 # ============================================
 
 # OpenCode TUI
