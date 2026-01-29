@@ -4,7 +4,7 @@
   "description": "AI-assisted programming framework for modern agents",
   "main": "src/index.js",
   "bin": {
-    "agents-config": "./bin/cli.js"
+    "agents-config": "bin/cli.js"
   },
   "type": "module",
   "scripts": {
