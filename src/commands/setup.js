@@ -213,10 +213,10 @@ export async function setup() {
 
 async function setupOpenCode(skills, personas, workflows, installMode, force) {
   const dir = '.opencode';
-  await fs.ensureDir(join(REPO_ROOT, dir, 'skills'));
-  await fs.ensureDir(join(REPO_ROOT, dir, 'agents'));
-  await fs.ensureDir(join(REPO_ROOT, dir, 'commands'));
-  await fs.ensureDir(join(REPO_ROOT, dir, 'rules'));
+  const dirAbs = join(REPO_ROOT, dir);
+  
+  // Aseguramos que el directorio base exista antes de crear subcarpetas
+  await fs.ensureDir(dirAbs);
 
   // Rules (Always sync for precision)
   await applyConfig(join(dir, 'rules'), '.agents/rules', installMode, force);
@@ -238,6 +238,7 @@ async function setupOpenCode(skills, personas, workflows, installMode, force) {
 
   // opencode.json
   const configPath = join(REPO_ROOT, 'opencode.json');
+
   if (!(await fs.pathExists(configPath)) || force) {
     const rulesPath = installMode === 'modular' ? '.agents/rules/*.md' : '.opencode/rules/*.md';
     const agentsMdPath = installMode === 'modular' ? 'AGENTS.md' : 'GEMINI.md';
