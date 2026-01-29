@@ -15,12 +15,40 @@ let SOURCE_DIR = join(REPO_ROOT, '.agents');
 async function ensureSource(installMode) {
   if (installMode === 'modular') {
     if (!(await fs.pathExists(SOURCE_DIR))) {
-      await fs.copy(join(PACKAGE_ROOT, '.agents'), SOURCE_DIR);
-      await fs.copy(join(PACKAGE_ROOT, 'AGENTS.md'), join(REPO_ROOT, 'AGENTS.md'));
+      const packageSource = join(PACKAGE_ROOT, '.agents');
+      
+      // Verify package source exists
+      if (!(await fs.pathExists(packageSource))) {
+        throw new Error(`Package source directory not found: ${packageSource}\nPackage may be corrupted or improperly installed.`);
+      }
+      
+      // Ensure the target directory exists before copying
+      await fs.ensureDir(SOURCE_DIR);
+      await fs.copy(packageSource, SOURCE_DIR);
+      
+      // Verify critical directories were copied
+      const criticalDirs = ['skills', 'rules', 'agents', 'workflows'];
+      for (const dir of criticalDirs) {
+        const dirPath = join(SOURCE_DIR, dir);
+        if (!(await fs.pathExists(dirPath))) {
+          throw new Error(`Critical directory missing after copy: ${dirPath}`);
+        }
+      }
+      
+      // Also copy AGENTS.md if it doesn't exist
+      const agentsMdTarget = join(REPO_ROOT, 'AGENTS.md');
+      if (!(await fs.pathExists(agentsMdTarget))) {
+        await fs.copy(join(PACKAGE_ROOT, 'AGENTS.md'), agentsMdTarget);
+      }
     }
   } else {
     // In standalone mode, we use the package's own .agents as source
     SOURCE_DIR = join(PACKAGE_ROOT, '.agents');
+    
+    // Verify package source exists in standalone mode too
+    if (!(await fs.pathExists(SOURCE_DIR))) {
+      throw new Error(`Package source directory not found: ${SOURCE_DIR}\nPackage may be corrupted or improperly installed.`);
+    }
   }
 }
 
@@ -93,6 +121,14 @@ export async function setup() {
   }
 
   await ensureSource(installMode);
+
+  // Validate that source directory was properly set up
+  if (!(await fs.pathExists(SOURCE_DIR))) {
+    p.cancel(`Failed to initialize source directory at ${SOURCE_DIR}`);
+    console.error(`Package root: ${PACKAGE_ROOT}`);
+    console.error(`Expected source: ${join(PACKAGE_ROOT, '.agents')}`);
+    process.exit(1);
+  }
 
   const agents = await p.multiselect({
     message: 'Select agents to configure:',
