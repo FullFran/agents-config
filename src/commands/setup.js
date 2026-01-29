@@ -14,32 +14,28 @@ let SOURCE_DIR = join(REPO_ROOT, '.agents');
 
 async function ensureSource(installMode) {
   if (installMode === 'modular') {
-    if (!(await fs.pathExists(SOURCE_DIR))) {
-      const packageSource = join(PACKAGE_ROOT, '.agents');
-      
-      // Verify package source exists
-      if (!(await fs.pathExists(packageSource))) {
-        throw new Error(`Package source directory not found: ${packageSource}\nPackage may be corrupted or improperly installed.`);
+    const packageSource = join(PACKAGE_ROOT, '.agents');
+    
+    // Verify package source exists
+    if (!(await fs.pathExists(packageSource))) {
+      throw new Error(`Package source directory not found: ${packageSource}\nPackage may be corrupted or improperly installed.`);
+    }
+
+    await fs.ensureDir(SOURCE_DIR);
+    
+    // Ensure critical directories were copied
+    const criticalDirs = ['skills', 'rules', 'agents', 'workflows'];
+    for (const dir of criticalDirs) {
+      const dirPath = join(SOURCE_DIR, dir);
+      if (!(await fs.pathExists(dirPath))) {
+        await fs.copy(join(packageSource, dir), dirPath);
       }
-      
-      // Ensure the target directory exists before copying
-      await fs.ensureDir(SOURCE_DIR);
-      await fs.copy(packageSource, SOURCE_DIR);
-      
-      // Verify critical directories were copied
-      const criticalDirs = ['skills', 'rules', 'agents', 'workflows'];
-      for (const dir of criticalDirs) {
-        const dirPath = join(SOURCE_DIR, dir);
-        if (!(await fs.pathExists(dirPath))) {
-          throw new Error(`Critical directory missing after copy: ${dirPath}`);
-        }
-      }
-      
-      // Also copy AGENTS.md if it doesn't exist
-      const agentsMdTarget = join(REPO_ROOT, 'AGENTS.md');
-      if (!(await fs.pathExists(agentsMdTarget))) {
-        await fs.copy(join(PACKAGE_ROOT, 'AGENTS.md'), agentsMdTarget);
-      }
+    }
+    
+    // Also copy AGENTS.md if it doesn't exist
+    const agentsMdTarget = join(REPO_ROOT, 'AGENTS.md');
+    if (!(await fs.pathExists(agentsMdTarget))) {
+      await fs.copy(join(PACKAGE_ROOT, 'AGENTS.md'), agentsMdTarget);
     }
   } else {
     // In standalone mode, we use the package's own .agents as source
@@ -70,9 +66,14 @@ async function applyConfig(target, sourceRel, installMode, forceAll = false) {
     ? (installMode === 'modular' ? join(REPO_ROOT, 'AGENTS.md') : join(PACKAGE_ROOT, 'AGENTS.md'))
     : sourceAbs;
 
-  if (!(await fs.pathExists(finalSourceAbs))) {
-    // Si la fuente no existe, es un error crítico del paquete o del repo
-    throw new Error(`Source path missing: ${finalSourceAbs}`);
+  let sourceStat;
+  try {
+    sourceStat = await fs.stat(finalSourceAbs);
+  } catch (e) {
+    if (e.code === 'ENOENT') {
+      throw new Error(`Source path missing: ${finalSourceAbs}`);
+    }
+    throw e;
   }
 
   await fs.ensureDir(dirname(targetAbs));
@@ -97,7 +98,7 @@ async function applyConfig(target, sourceRel, installMode, forceAll = false) {
 
   if (installMode === 'modular') {
     const relTarget = relative(dirname(targetAbs), finalSourceAbs);
-    const type = (await fs.stat(finalSourceAbs)).isDirectory() ? 'dir' : 'file';
+    const type = sourceStat.isDirectory() ? 'dir' : 'file';
     await fs.symlink(relTarget, targetAbs, type);
   } else {
     await fs.copy(finalSourceAbs, targetAbs);
