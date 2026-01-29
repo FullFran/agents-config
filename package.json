@@ -1,6 +1,6 @@
 {
   "name": "@fullfran/agents-config",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "AI-assisted programming framework for modern agents",
   "main": "src/index.js",
   "bin": {
