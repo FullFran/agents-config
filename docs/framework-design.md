@@ -7,11 +7,11 @@ This framework is designed to bridge the gap between general agent standards (`A
 ```mermaid
 graph TD
     Root[Project Root] --> AGENTS_MD[AGENTS.md - General Context]
-    Root --> AgentDir[.agent/ - Antigravity optimized]
+    Root --> AgentDir[.agents/ - Antigravity optimized]
 
-    AgentDir --> Rules[.agent/rules/ - Project Rules]
-    AgentDir --> Skills[.agent/skills/ - Specialized Units]
-    AgentDir --> Workflows[.agent/workflows/ - Automated Flows]
+    AgentDir --> Rules[.agents/rules/ - Project Rules]
+    AgentDir --> Skills[.agents/skills/ - Specialized Units]
+    AgentDir --> Workflows[.agents/workflows/ - Automated Flows]
 
     Skills --> S1[skill-creator]
     Skills --> S2[custom-skill-n]

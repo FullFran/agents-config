@@ -1,0 +1,40 @@
+{
+  "name": "@fullfran/agents-config",
+  "version": "1.0.0",
+  "description": "AI-assisted programming framework for modern agents",
+  "main": "src/index.js",
+  "bin": {
+    "agents-config": "./bin/cli.js"
+  },
+  "type": "module",
+  "scripts": {
+    "start": "node bin/cli.js",
+    "init": "node bin/cli.js init",
+    "sync": "node bin/cli.js sync",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "antigravity",
+    "opencode",
+    "claude",
+    "config",
+    "framework"
+  ],
+  "author": "FullFran",
+  "license": "MIT",
+  "files": [
+    "bin/",
+    "src/",
+    ".agents/",
+    "AGENTS.md",
+    "README.md"
+  ],
+  "dependencies": {
+    "@clack/prompts": "^0.9.1",
+    "picocolors": "^1.1.1",
+    "commander": "^13.1.0",
+    "fs-extra": "^11.3.0"
+  }
+}

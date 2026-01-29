@@ -15,7 +15,8 @@ All AI agents working on this repository MUST adhere to the following rules:
 
 ## Architecture
 - Do NOT create ad-hoc scripts in the root directory. Use the `scripts/` directory.
-- All new agent capabilities MUST be implemented as a "Skill" in the `.agent/skills/` directory.
+- All new agent capabilities MUST be implemented as a "Skill" in the `.agents/skills/` directory.
+- A symlink `.agent` -> `.agents` is maintained for IDE compatibility (Antigravity).
 - Every `SKILL.md` file MUST contain a valid YAML frontmatter with `name` and `description`.
 
 ## Communication
@@ -24,4 +25,4 @@ All AI agents working on this repository MUST adhere to the following rules:
 
 ## Automation
 - Use the provided scripts in `scripts/` for framework maintenance tasks.
-- If a workflow exists in `.agent/workflows/` for a task, prioritize using it.
+- If a workflow exists in `.agents/workflows/` for a task, prioritize using it.

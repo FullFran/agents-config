@@ -3,9 +3,13 @@
 .vscode/
 
 # ============================================
-# GENERATED AGENT CONFIGS (run ./scripts/setup-agents.sh)
-# Source of truth: AGENTS.md + .agent/
+# GENERATED AGENT CONFIGS (run npm run init)
+# Source of truth: AGENTS.md + .agents/
 # ============================================
+
+# Antigravity IDE (Target sync)
+.agent/
+GEMINI.md
 
 # OpenCode TUI
 .opencode/
@@ -14,10 +18,6 @@ opencode.json
 # Claude Code
 .claude/
 CLAUDE.md
-
-# Gemini / Antigravity (legacy)
-GEMINI.md
-.gemini/
 
 # GitHub Copilot
 .github/copilot-instructions.md

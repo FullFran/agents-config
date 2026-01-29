@@ -15,10 +15,10 @@ This skill guides the agent in creating a new Agent Skill following the official
 1. **Identify the Need**: Determine the specific competence to modularize.
 2. **Naming**: Choose a name (1-64 chars, lowercase alphanumeric and hyphens only).
 3. **Directory Structure**:
-   - Create `.agent/skills/<skill-name>/`
-   - (Optional) `.agent/skills/<skill-name>/scripts/` for executable code.
-   - (Optional) `.agent/skills/<skill-name>/references/` for deep documentation.
-   - (Optional) `.agent/skills/<skill-name>/assets/` for templates and static files.
+   - Create `.agents/skills/<skill-name>/`
+   - (Optional) `.agents/skills/<skill-name>/scripts/` for executable code.
+   - (Optional) `.agents/skills/<skill-name>/references/` for deep documentation.
+   - (Optional) `.agents/skills/<skill-name>/assets/` for templates and static files.
 4. **Initialize SKILL.md**:
    - MUST include YAML frontmatter with `name` and `description`.
    - Name MUST match the directory name.
