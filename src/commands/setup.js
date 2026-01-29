@@ -42,6 +42,11 @@ async function applyConfig(target, sourceRel, installMode, forceAll = false) {
     ? (installMode === 'modular' ? join(REPO_ROOT, 'AGENTS.md') : join(PACKAGE_ROOT, 'AGENTS.md'))
     : sourceAbs;
 
+  if (!(await fs.pathExists(finalSourceAbs))) {
+    // Si la fuente no existe, es un error crítico del paquete o del repo
+    throw new Error(`Source path missing: ${finalSourceAbs}`);
+  }
+
   await fs.ensureDir(dirname(targetAbs));
   
   const exists = await fs.pathExists(targetAbs);
