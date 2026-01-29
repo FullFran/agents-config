@@ -41,7 +41,7 @@ Cuando realices las siguientes tareas, DEBES cargar la skill correspondiente par
 
 | Creación de nuevas skills | `skill-creator` | "Necesito crear una nueva habilidad" |
 | Creación de nuevos workflows | `workflow-creator` | "Necesito crear un nuevo workflow" |
-| Sincronización de metadatos | `scripts/sync-skills.sh` | "Actualiza el índice de skills" |
+| Sincronización de metadatos | `npm run sync` | "Actualiza el índice de skills" |
 | Documentación técnica | `docs-standard` | "Escribe un nuevo documento en docs/" |
 
 ## Workflows (Slash Commands)

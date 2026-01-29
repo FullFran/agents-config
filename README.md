@@ -21,14 +21,16 @@ Framework multi-agente para desarrollo asistido por IA. Una sola fuente de verda
 git clone <repo>
 cd <repo>
 
-# 2. Configura tu agente (modo interactivo)
-./scripts/setup-agents.sh
-
-# O configura uno específico
-./scripts/setup-agents.sh --opencode
-./scripts/setup-agents.sh --antigravity
-./scripts/setup-agents.sh --all
+# 2. Instala dependencias e inicia el setup interactivo
+npm install
+npm start
 ```
+
+---
+
+## Comandos Disponibles
+
+- `npm start` (o `npx agents-config init`): Inicia la TUI moderna para configurar tus agentes y elegir qué habilidades (skills) activar.
 
 ---
 
