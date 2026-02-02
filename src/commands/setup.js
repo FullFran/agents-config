@@ -3,6 +3,7 @@ import pc from 'picocolors';
 import fs from 'fs-extra';
 import { join, dirname, relative } from 'path';
 import { fileURLToPath } from 'url';
+import { reconcileResources } from './sync.js';
 
 const REPO_ROOT = process.cwd();
 const __filename = fileURLToPath(import.meta.url);
@@ -54,20 +55,35 @@ async function applyConfig(target, sourceRel, installMode, forceAll = false) {
   const finalSourceAbs = sourceRel === 'AGENTS.md' ? (installMode === 'modular' ? join(REPO_ROOT, 'AGENTS.md') : join(PACKAGE_ROOT, 'AGENTS.md')) : sourceAbs;
 
   let sourceStat = await fs.stat(finalSourceAbs);
-  await fs.ensureDir(dirname(targetAbs));
   
-  const exists = await fs.pathExists(targetAbs);
-  if (exists && !forceAll) {
-    const lstat = await fs.lstat(targetAbs);
-    if (!lstat.isSymbolicLink()) {
-      const backupPath = `${targetAbs}.backup-${Date.now()}`;
-      await fs.move(targetAbs, backupPath);
+  // SI ES UNA CARPETA, NO LA BORRAMOS. LA ASEGURAMOS Y PROCESAMOS CONTENIDO.
+  if (sourceStat.isDirectory()) {
+    await fs.ensureDir(targetAbs);
+    const files = await fs.readdir(finalSourceAbs);
+    for (const file of files) {
+      await applyConfig(join(target, file), join(sourceRel, file), installMode, forceAll);
     }
+    return;
   }
+
+  // SI ES UN ARCHIVO
+  await fs.ensureDir(dirname(targetAbs));
+  const exists = await fs.pathExists(targetAbs);
+  
+  if (exists && !forceAll) {
+    try {
+      const lstat = await fs.lstat(targetAbs);
+      if (!lstat.isSymbolicLink()) {
+        const backupPath = `${targetAbs}.backup-${Date.now()}`;
+        await fs.move(targetAbs, backupPath);
+      }
+    } catch (e) {}
+  }
+
   await fs.remove(targetAbs); 
   if (installMode === 'modular') {
     const relTarget = relative(dirname(targetAbs), finalSourceAbs);
-    await fs.symlink(relTarget, targetAbs, sourceStat.isDirectory() ? 'dir' : 'file');
+    await fs.symlink(relTarget, targetAbs, 'file');
   } else {
     await fs.copy(finalSourceAbs, targetAbs);
   }
@@ -182,7 +198,9 @@ export async function setup() {
 
   try {
     if (installMode === 'modular' && !(await fs.pathExists(join(REPO_ROOT, '.agent')))) {
-      await applyConfig('.agent', '.agents', 'modular', true);
+      await fs.ensureDir(join(REPO_ROOT, '.agents'));
+      const packageSource = join(PACKAGE_ROOT, '.agents');
+      await fs.copy(packageSource, join(REPO_ROOT, '.agents'), { overwrite: false });
     }
 
     for (const agent of agents) {
@@ -195,8 +213,11 @@ export async function setup() {
 
     // Actualizar package.json del usuario
     await updatePackageScripts(prefix);
+    
+    // IMPORTANTE: Reconciliación inversa para no perder nada de lo que ya tenía el usuario
+    await reconcileResources(REPO_ROOT);
 
-    s.stop(pc.green('Configuration complete!'));
+    s.stop(pc.green('Configuration complete! Resources reconciled.'));
   } catch (error) {
     s.stop(pc.red('Setup failed.'));
     console.error(error);
