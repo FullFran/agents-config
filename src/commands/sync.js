@@ -50,9 +50,15 @@ export async function reconcileResources(root) {
       const skills = await fs.readdir(agentSkillsPath, { withFileTypes: true });
       for (const dirent of skills) {
         if (!dirent.isDirectory()) continue;
+        const targetPath = join(agentSkillsPath, dirent.name);
         const sourcePath = join(centralSkills, dirent.name);
+        
+        // SEGURIDAD: Si es un symlink, ignorar (ya está vinculado)
+        const lstat = await fs.lstat(targetPath);
+        if (lstat.isSymbolicLink()) continue;
+
         if (!(await fs.pathExists(sourcePath))) {
-          await fs.copy(join(agentSkillsPath, dirent.name), sourcePath);
+          await fs.copy(targetPath, sourcePath);
           importsCount++;
         }
       }
@@ -63,9 +69,15 @@ export async function reconcileResources(root) {
       const workflows = await fs.readdir(agentWorkflowsPath);
       for (const file of workflows) {
         if (!file.endsWith('.md')) continue;
+        const targetPath = join(agentWorkflowsPath, file);
         const sourcePath = join(centralWorkflows, file);
+
+        // SEGURIDAD: Si es un symlink, ignorar
+        const lstat = await fs.lstat(targetPath);
+        if (lstat.isSymbolicLink()) continue;
+
         if (!(await fs.pathExists(sourcePath))) {
-          await fs.copy(join(agentWorkflowsPath, file), sourcePath);
+          await fs.copy(targetPath, sourcePath);
           importsCount++;
         }
       }
