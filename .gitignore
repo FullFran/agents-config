@@ -43,3 +43,6 @@ mktemp.*
 node_modules/
 dist/
 build/
+
+# Sandbox for local testing (DO NOT run init in root!)
+sandbox/
