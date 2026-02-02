@@ -154,6 +154,29 @@ export async function setup() {
   if (p.isCancel(selectedWorkflows)) process.exit(0);
   if (selectedWorkflows.includes('all')) selectedWorkflows = availableWorkflows.map(w => w.value);
 
+  // 5. SCRIPTS NAMESPACE
+  const scriptMode = await p.select({
+    message: 'How should scripts be named in your package.json?',
+    options: [
+      { value: 'standard', label: 'Standard', hint: 'sync, init, add-skill...' },
+      { value: 'namespaced', label: 'Namespaced (Recommended)', hint: 'agents:sync, agents:init...' },
+      { value: 'custom', label: 'Custom Prefix', hint: 'yourprefix:sync...' },
+    ],
+  });
+
+  if (p.isCancel(scriptMode)) process.exit(0);
+
+  let prefix = '';
+  if (scriptMode === 'namespaced') prefix = 'agents';
+  if (scriptMode === 'custom') {
+    prefix = await p.text({
+      message: 'Enter custom prefix:',
+      placeholder: 'ai',
+      validate: (v) => !v ? 'Prefix is required' : undefined
+    });
+    if (p.isCancel(prefix)) process.exit(0);
+  }
+
   const s = p.spinner();
   s.start('Configuring agents...');
 
@@ -169,13 +192,40 @@ export async function setup() {
       if (agent === 'cursor') await setupCursor(installMode);
       if (agent === 'antigravity') await setupAntigravity(selectedSkills, selectedPersonas, selectedWorkflows, installMode);
     }
+
+    // Actualizar package.json del usuario
+    await updatePackageScripts(prefix);
+
     s.stop(pc.green('Configuration complete!'));
   } catch (error) {
     s.stop(pc.red('Setup failed.'));
     console.error(error);
   }
 
-  p.outro(`✨ ${pc.bold('Ready!')} Run ${pc.cyan('npm run sync')} to finalize.`);
+  const syncCmd = prefix ? `npm run ${prefix}:sync` : 'npm run sync';
+  p.outro(`✨ ${pc.bold('Ready!')} Run ${pc.cyan(syncCmd)} to finalize.`);
+}
+
+async function updatePackageScripts(prefix = '') {
+  const pkgPath = join(REPO_ROOT, 'package.json');
+  if (!(await fs.pathExists(pkgPath))) return;
+
+  const pkg = await fs.readJson(pkgPath);
+  pkg.scripts = pkg.scripts || {};
+
+  const keys = {
+    sync: prefix ? `${prefix}:sync` : 'sync',
+    init: prefix ? `${prefix}:init` : 'init',
+    addSkill: prefix ? `${prefix}:add-skill` : 'add-skill',
+    addWorkflow: prefix ? `${prefix}:add-workflow` : 'add-workflow'
+  };
+
+  pkg.scripts[keys.sync] = "agents-config sync";
+  pkg.scripts[keys.init] = "agents-config init";
+  pkg.scripts[keys.addSkill] = "agents-config add-skill";
+  pkg.scripts[keys.addWorkflow] = "agents-config add-workflow";
+
+  await fs.writeJson(pkgPath, pkg, { spaces: 2 });
 }
 
 async function setupOpenCode(skills, personas, workflows, installMode) {
