@@ -1,168 +1,54 @@
-# Agents Config (Agentic-First Framework)
+# AI-Assisted Programming Framework 🤖
 
-Framework multi-agente para desarrollo asistido por IA. Una sola fuente de verdad, compatible con todos los IDEs y agentes de terminal.
+Plantilla estándar para gestionar configuraciones de agentes de IA (OpenCode, Antigravity, Claude Code, Cursor, Copilot) en proyectos de equipo. Asegura que todos los miembros usen las mismas reglas, skills y workflows, independientemente del agente que prefieran.
 
-## Agentes Soportados
+## 🚀 Inicio Rápido (en un proyecto nuevo)
 
-| Agente | Comando | Archivo generado |
-|--------|---------|------------------|
-| OpenCode TUI | `--opencode` | `.opencode/` + `opencode.json` |
-| Claude Code | `--claude` | `.claude/` + `CLAUDE.md` |
-| Cursor | `--cursor` | `.cursorrules` |
-| GitHub Copilot | `--copilot` | `.github/copilot-instructions.md` |
-| Antigravity IDE | `--antigravity` | `GEMINI.md` |
-
----
-
-## Quick Start
+Puedes instalar y configurar este framework en cualquier repositorio ejecutando:
 
 ```bash
-# 1. Clona el repo
-git clone <repo>
-cd <repo>
-
-# 2. Instala dependencias e inicia el setup interactivo
-npm install
-npm start
+npx @fullfran/agents-config init
 ```
 
----
+Esto lanzará un asistente interactivo para elegir tus agentes, skills y el modo de instalación.
 
-## Comandos Disponibles
+## 🛠️ Comandos de Mantenimiento
 
-- `npm start` (o `npx agents-config init`): Inicia la TUI moderna para configurar tus agentes y elegir qué habilidades (skills) activar.
+Una vez instalado, usa estos comandos para mantener el framework:
 
----
+- `npm run sync`: **Sincronización Bidireccional**. 
+  - Escanea `.opencode/`, `.agent/` y `.claude/` buscando nuevos recursos.
+  - Importa cualquier skill o workflow nuevo a la fuente de verdad (`.agents/`).
+  - Actualiza automáticamente las tablas en `AGENTS.md`.
+- `npm run add-skill`: Crea una nueva competencia estructurada.
+- `npm run add-workflow`: Crea un nuevo comando slash interactivo.
+- `npm run init`: Re-configura agentes o habilita nuevos recursos.
 
-## Arquitectura
+## 👥 Flujo de Trabajo en Equipo
 
-```
-📁 Proyecto
-├── AGENTS.md              ← Fuente de verdad (SE COMMITEA)
-├── .agents/                ← Fuente de verdad (SE COMMITEA)
-├── .agent                 → .agents (Symlink para compatibilidad con Antigravity)
-│   ├── skills/            ← Habilidades modulares (agentskills.io)
-│   ├── rules/             ← Reglas de arquitectura/estilo
-│   ├── workflows/         ← Automatizaciones (slash commands)
-│   └── agents/            ← Personas / Output Styles (ej: code-ninja)
-│
-│   ─── GENERADOS (symlinks, en .gitignore) ───
-├── CLAUDE.md              → AGENTS.md
-├── GEMINI.md              → AGENTS.md
-├── .cursorrules           → AGENTS.md
-├── .github/copilot-instr. → AGENTS.md
-├── .opencode/skills/*     → .agents/skills/*
-├── .opencode/agents/*     → .agents/agents/* (Personas)
-├── .opencode/commands/*   → .agents/workflows/* (Slash Commands)
-└── .claude/skills         → .agents/skills
-```
+El framework está diseñado para la colaboración multiplataforma:
 
-### Fuente de Verdad
+1. **Si usas OpenCode**: Edita tus archivos en `.opencode/`.
+2. **Si usas Antigravity**: Edita tus archivos en `.agent/`.
+3. **Sincronización**: Antes de hacer commit, cualquier miembro del equipo ejecuta `npm run sync`.
+   - Si creaste un skill nuevo en `.agent/skills/mi-skill`, el comando `sync` lo detectará y lo moverá a la carpeta central `.agents/skills/`.
+   - Al hacer commit de `.agents/`, el resto del equipo recibirá la actualización.
+   - Ellos solo tendrán que correr `npm run init` (o `sync`) para tener ese nuevo skill disponible en sus respectivos agentes.
 
-Solo se commitean dos cosas:
+## 🏗️ Estructura del Proyecto
 
-1. **`AGENTS.md`**: Instrucciones generales del proyecto para cualquier agente IA.
-2. **`.agents/`**: El cerebro modular (Skills siguiendo el estándar `agentskills.io`, reglas, personas y workflows).
+- `.agents/`: **Fuente de Verdad**. Aquí vive la configuración real.
+  - `skills/`: Capacidades modulares (`SKILL.md`).
+  - `workflows/`: Comandos slash (`.md`).
+  - `agents/`: Personas y estilos de respuesta.
+  - `rules/`: Reglas globales del proyecto.
+- `AGENTS.md`: Documentación generada automáticamente que los agentes de IA leen para entender sus capacidades.
+- `.opencode/`, `.agent/`, `.claude/`: Carpetas generadas (normalmente symlinks) que cada herramienta usa localmente.
 
-Todo lo demás se genera localmente con symlinks. Si modificas la fuente de verdad, todos los agentes ven el cambio automáticamente.
+## 💡 Recomendaciones
 
----
-
-## 🛠️ Flujo de Trabajo (Añadir Contenido)
-
-Para mantener la integridad del sistema, **todo el contenido nuevo debe nacer en la carpeta `.agents/`**.
-
-1. **Nueva Skill**: Crear en `.agents/skills/nombre-skill/`.
-2. **Nuevo Workflow**: Crear en `.agents/workflows/nombre.md`.
-3. **Nueva Persona**: Crear en `.agents/agents/nombre.md`.
-
-Una vez creado el archivo, ejecuta:
-```bash
-./scripts/sync-skills.sh
-```
-Esto creará los symlinks necesarios en `.opencode/`, `.claude/`, etc., y actualizará el índice global de `AGENTS.md`.
-
-> [!IMPORTANT]
-> Si editas un archivo directamente desde las carpetas generadas (ej: `.opencode/skills/skill.md`), **el cambio se guardará en la fuente de verdad** porque son symlinks. Sin embargo, evita crear archivos nuevos fuera de `.agents/` ya que no serán trackeados correctamente.
+- **Modo Modular**: Instala siempre en modo modular (usando symlinks). Es lo que permite que los cambios en las carpetas de los agentes se reflejen instantáneamente en la fuente de verdad.
+- **Git**: El archivo `.gitignore` generado ignorará las carpetas específicas de los agentes, manteniendo el repositorio limpio y solo trackeando la carpeta central `.agents/`.
 
 ---
-
-## Cómo Funciona (Desarrollador)
-
-1. **Clona el repo** y ejecuta `./scripts/setup-agents.sh`.
-2. **Elige tu agente** (OpenCode, Antigravity, Claude, etc.).
-3. **Trabaja normalmente**: El agente ya tiene todo el contexto, habilidades, comandos personalizados y estilos de salida.
-
----
-
-## Agentes y Personas (Output Styles)
-
-El framework permite definir distintas "personalidades" en `.agents/agents/`. Esto es equivalente a los *Output Styles* de Claude.
-
-- **OpenCode**: Puedes invocar personalidades específicas usando el prefijo `@` (ej: `@code-ninja`).
-- **Antigravity**: Las personalidades se inyectan como reglas de sistema para guiar el estilo de respuesta.
-
-### Personas Incluidas:
-- `senior-architect`: Tu mentor de confianza. Explicativo, cálido y enfocado en buenas prácticas.
-- `code-ninja`: Estilo minimalista. Sin charlas, solo código y lo estrictamente necesario.
-
----
-
-## Cómo Funciona (Mantenedor)
-
-### Para el mantenedor
-
-1. **Edita `AGENTS.md`** para cambiar instrucciones globales.
-2. **Crea skills en `.agents/skills/`** para capacidades específicas (validadas por script).
-3. **Crea workflows en `.agents/workflows/`** que se convierten en comandos `/slash` para OpenCode y Antigravity.
-4. **Ejecuta `./scripts/sync-skills.sh`** para mantener todo en sincronía y validar estándares.
-
----
-
-## Scripts Disponibles
-
-| Script | Descripción |
-|--------|-------------|
-| `./scripts/setup-agents.sh` | Configura agentes (interactivo o con flags). Crea symlinks locales. |
-| `./scripts/sync-skills.sh` | Valida skills (`agentskills.io`) y sincroniza metadatos y comandos. |
-
----
-
-## Crear una Skill Nueva
-
-```bash
-# 1. Crea el directorio
-mkdir -p .agents/skills/mi-skill
-
-# 2. Crea el archivo SKILL.md (Usa la skill 'skill-creator' para ayuda)
-# MUST: name coincida con carpeta, descripción < 1024 chars.
-
-# 3. Sincroniza y Valida
-./scripts/sync-skills.sh
-```
-
----
-
-## Workflows y Slash Commands
-
-Los archivos en `.agents/workflows/*.md` se mapean automáticamente como comandos en los agentes compatibles (como OpenCode).
-- Ejemplo: `create-skill.md` se convierte en el comando `/create-skill` en la TUI.
-
----
-
-## FAQ
-
-### ¿Por qué symlinks en vez de copias?
-Para que al modificar la fuente de verdad todos los agentes vean el cambio al instante sin re-ejecutar scripts.
-
-### ¿Qué pasa si agrego una skill o workflow nuevo?
-Ejecuta `./scripts/sync-skills.sh`. El script detectará tus agentes activos y creará los symlinks necesarios automáticamente.
-
----
-
-## Estándares Utilizados
-
-- **Persona**: `AGENTS.md` (Standard de instrucciones para agentes).
-- **Skills**: `agentskills.io` (Estructura modular de habilidades).
-- **Workflows**: Estándar nativo de Antigravity / OpenCode Commands.
-- **Scripts**: Bash (Sincronización y validación automática).
+Creado por **FullFran** para equipos de desarrollo modernos.

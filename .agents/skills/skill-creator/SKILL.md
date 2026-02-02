@@ -24,6 +24,7 @@ This skill guides the agent in creating a new Agent Skill following the official
    - Name MUST match the directory name.
    - Description MUST be under 1024 characters.
 5. **Progressive Disclosure**: Keep `SKILL.md` under 500 lines. Move heavy technical details to `references/`.
+6. **Sincronización Obligatoria**: Una vez creada la skill, DEBES ejecutar `npm run sync` para actualizar la documentación global del proyecto en `AGENTS.md`.
 
 ## Frontmatter Template
 ```yaml

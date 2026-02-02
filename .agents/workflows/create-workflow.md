@@ -1,15 +1,16 @@
 ---
-description: create-workflow automated workflow
+description: Automated workflow to create a new slash command workflow
 ---
 
 # Workflow: Create Workflow
 
-This workflow automates the process of creating a new AI Workflow.
+Cuando el usuario use `/create-workflow`, sigue estos pasos:
 
-## Steps
+1. **Planear**: Pregunta qué pasos debe automatizar el nuevo workflow y cómo se llamará (nombre para el slash command).
+2. **Crear**: Escribe el archivo `.agents/workflows/<nombre>.md`. 
+   - Debe incluir frontmatter con una descripción breve.
+   - Debe listar los pasos de forma clara.
+3. **Sincronizar**: Ejecuta `npm run sync` para que el nuevo comando sea reconocido.
+4. **Habilitar**: Recuerda al usuario que debe ejecutar `npm run init` si quiere habilitar el comando en otros agentes (Copilot, Cursor, etc.).
 
-1. Ask the agent to define the workflow steps and description.
-   // turbo
-2. Create the file: `touch .agents/workflows/<workflow-name>.md`
-3. Initialize the file with the standard template and steps.
-4. Verify the new workflow appears in the Customizations panel.
+// turbo

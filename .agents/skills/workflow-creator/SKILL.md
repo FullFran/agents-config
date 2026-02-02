@@ -26,4 +26,5 @@ description: [short title]
 1. **Define Task**: Identify the sequence of steps.
 2. **Create File**: `.agents/workflows/<workflow-name>.md`
 3. **Annotate**: Use `// turbo` for safe command steps.
-4. **Register**: Mention the workflow in the project documentation.
+4. **Sync**: Ejecuta `npm run sync` para que el nuevo workflow aparezca en la documentación global.
+5. **Enable**: Informa al usuario que debe ejecutar `npm run init` si quiere habilitar el comando en agentes no-automáticos (como Cursor o Copilot).
